@@ -1,4 +1,4 @@
-<?php include 'header.php'; ?>
+<?php include 'public_html/header.php'; ?>
 
 <main class="main-content">
     <div class="container">
@@ -9,9 +9,9 @@
         <section class="services">
     <div class="services-grid">
         <!-- Cadastre seu Prédio - Verde -->
-        <a href="cadastro-predio.php" class="service-item green">
+        <a href="public_html/cadastro-predio.php" class="service-item green">
             <div class="service-icon">
-                <img src="images/eco_rec_.png" alt="Ícone" style="width: 280px; height: auto; margin-bottom: 5px;">
+                <img src="public_html/images/eco_rec_.png" alt="Ícone" style="width: 280px; height: auto; margin-bottom: 5px;">
                 <i class="bi bi-building"></i>
             </div>
             <h3>Cadastre seu Prédio</h3>
@@ -19,9 +19,9 @@
         </a>
 
         <!-- Compre Energia Verde - Rosa -->
-        <a href="comprar-energia.php" class="service-item pink">
+        <a href="public_html/comprar-energia.php" class="service-item pink">
             <div class="service-icon">
-                <img src="images/eco_rec_.png" alt="Ícone" style="width: 280px; height: auto; margin-bottom: 5px;">
+                <img src="public_html/images/eco_rec_.png" alt="Ícone" style="width: 280px; height: auto; margin-bottom: 5px;">
                 <i class="bi bi-lightning-charge"></i>
             </div>
             <h3>Compre Energia Verde</h3>
@@ -29,9 +29,9 @@
         </a>
 
         <!-- Sobre o Projeto - Laranja-Avermelhado -->
-        <a href="sobre-projeto.php" class="service-item orange-red">
+        <a href="public_html/sobre-projeto.php" class="service-item orange-red">
             <div class="service-icon">
-                <img src="images/eco_rec_.png" alt="Ícone" style="width: 280px; height: auto; margin-bottom: 5px;">
+                <img src="public_html/images/eco_rec_.png" alt="Ícone" style="width: 280px; height: auto; margin-bottom: 5px;">
                 <i class="bi bi-info-circle"></i>
             </div>
             <h3>Sobre o Projeto</h3>
@@ -39,9 +39,9 @@
         </a>
 
         <!-- Contato / Suporte - Roxo -->
-        <a href="contato.php" class="service-item purple">
+        <a href="public_html/contato.php" class="service-item purple">
             <div class="service-icon">
-                <img src="images/eco_rec_.png" alt="Ícone" style="width: 280px; height: auto; margin-bottom: 5px;">
+                <img src="public_html/images/eco_rec_.png" alt="Ícone" style="width: 280px; height: auto; margin-bottom: 5px;">
                 <i class="bi bi-headset"></i>
             </div>
             <h3>Contato / Suporte</h3>
@@ -49,9 +49,9 @@
         </a>
 
         <!-- Mapa de Prédios - Amarelo Claro -->
-        <a href="mapa-predios.php" class="service-item light-yellow">
+        <a href="public_html/mapa/mapas.php" class="service-item light-yellow">
             <div class="service-icon">
-                <img src="images/eco_rec_.png" alt="Ícone" style="width: 280px; height: auto; margin-bottom: 5px;">
+                <img src="public_html/images/eco_rec_.png" alt="Ícone" style="width: 280px; height: auto; margin-bottom: 5px;">
                 <i class="bi bi-map"></i>
             </div>
             <h3>Mapa de Prédios</h3>
@@ -68,4 +68,4 @@
     </div>
 </main>
 
-<?php include 'footer.php'; ?>
+<?php include 'public_html/footer.php'; ?>
