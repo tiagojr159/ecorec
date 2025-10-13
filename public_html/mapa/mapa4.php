@@ -80,6 +80,7 @@ html, body {
   cursor: pointer;
   font-size: 14px;
   transition: background-color 0.3s;
+  margin-left: 5px;
 }
 
 .capture-btn:hover {
@@ -96,11 +97,101 @@ html, body {
   display: none;
 }
 
+/* Modal */
+.modal {
+  display: none;
+  position: fixed;
+  z-index: 2000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.8);
+  overflow: auto;
+}
+
+.modal-content {
+  background-color: #fefefe;
+  margin: 5% auto;
+  padding: 20px;
+  border: 1px solid #888;
+  width: 80%;
+  max-width: 800px;
+  border-radius: 10px;
+  position: relative;
+}
+
+.close {
+  color: #aaa;
+  float: right;
+  font-size: 28px;
+  font-weight: bold;
+  cursor: pointer;
+  position: absolute;
+  right: 15px;
+  top: 10px;
+}
+
+.close:hover,
+.close:focus {
+  color: black;
+  text-decoration: none;
+}
+
+.modal-image {
+  max-width: 100%;
+  display: block;
+  margin: 0 auto;
+  border-radius: 5px;
+}
+
+.modal-title {
+  margin-top: 0;
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+/* Loading */
+.loading-container {
+  display: none;
+  position: fixed;
+  z-index: 3000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.8);
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+}
+
+.loading-spinner {
+  border: 8px solid #f3f3f3;
+  border-top: 8px solid #3498db;
+  border-radius: 50%;
+  width: 60px;
+  height: 60px;
+  animation: spin 2s linear infinite;
+  margin-bottom: 20px;
+}
+
+.loading-text {
+  color: white;
+  font-size: 18px;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
 @media (max-width: 768px){
   .map-container { width: 95%; height: 70vh; margin: 10px auto; }
   .info-panel { bottom: 10px; right: 10px; padding: 10px; max-width: 200px; }
   .info-panel h3 { font-size: 0.9rem; }
   .info-panel p  { font-size: 0.8rem; }
+  .modal-content { width: 95%; margin: 10% auto; }
 }
 </style>
 
@@ -114,7 +205,7 @@ html, body {
     <h1 class="map-title">Mapa Satélite - Igarassu</h1>
     <div>
       <button id="selectAreaBtn" class="capture-btn">Selecionar Área</button>
-      <button id="captureBtn" class="capture-btn" style="display: none;">Capturar Seleção</button>
+      <button id="captureBtn" class="capture-btn" style="display: none;">Capturar e Melhorar</button>
     </div>
   </div>
 
@@ -128,6 +219,33 @@ html, body {
     <p><strong>Mapa:</strong> Satélite e Ruas</p>
     <p id="captureStatus" style="display: none;"><strong>Status:</strong> <span id="statusText">Aguardando seleção</span></p>
   </div>
+</div>
+
+<!-- Modal para imagem original -->
+<div id="originalModal" class="modal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <h2 class="modal-title">Imagem Original</h2>
+    <img id="originalImage" class="modal-image" src="" alt="Imagem original">
+  </div>
+</div>
+
+<!-- Modal para imagem melhorada -->
+<div id="enhancedModal" class="modal">
+  <div class="modal-content">
+    <span class="close">&times;</span>
+    <h2 class="modal-title">Imagem Melhorada pela IA</h2>
+    <img id="enhancedImage" class="modal-image" src="" alt="Imagem melhorada">
+    <div class="text-center mt-3">
+      <button id="downloadEnhancedBtn" class="btn btn-success">Baixar Imagem Melhorada</button>
+    </div>
+  </div>
+</div>
+
+<!-- Loading -->
+<div id="loadingContainer" class="loading-container">
+  <div class="loading-spinner"></div>
+  <div class="loading-text">Processando imagem com IA...</div>
 </div>
 
 <!-- ======== LEAFLET MAP JS ========= -->
@@ -179,6 +297,24 @@ html, body {
   const captureBtn = document.getElementById('captureBtn');
   const captureStatus = document.getElementById('captureStatus');
   const statusText = document.getElementById('statusText');
+
+  // Modais
+  const originalModal = document.getElementById('originalModal');
+  const enhancedModal = document.getElementById('enhancedModal');
+  const originalImage = document.getElementById('originalImage');
+  const enhancedImage = document.getElementById('enhancedImage');
+  const downloadEnhancedBtn = document.getElementById('downloadEnhancedBtn');
+
+  // Loading
+  const loadingContainer = document.getElementById('loadingContainer');
+
+  // Fechar modais
+  document.querySelectorAll('.close').forEach(closeBtn => {
+    closeBtn.addEventListener('click', function() {
+      originalModal.style.display = 'none';
+      enhancedModal.style.display = 'none';
+    });
+  });
 
   // Evento para iniciar a seleção
   selectAreaBtn.addEventListener('click', function() {
@@ -237,7 +373,7 @@ html, body {
     if (!isSelecting) return;
     
     startPoint = null;
-    statusText.textContent = 'Área selecionada. Clique em "Capturar Seleção"';
+    statusText.textContent = 'Área selecionada. Clique em "Capturar e Melhorar"';
   });
 
   // Evento para capturar a área selecionada
@@ -272,24 +408,70 @@ html, body {
       // Armazenar em memória
       capturedImageData = imageData;
       
-      // Criar link para download
-      const link = document.createElement('a');
-      link.download = 'mapa-capturado.png';
-      link.href = imageData;
-      link.click();
+      // Mostrar a imagem capturada no primeiro modal
+      originalImage.src = imageData;
+      originalModal.style.display = 'block';
       
       // Resetar seleção
       resetSelection();
       
-      statusText.textContent = 'Imagem capturada e salva com sucesso!';
+      statusText.textContent = 'Imagem capturada. Enviando para IA...';
       
-      // Mostrar a imagem capturada em um modal
-      showCapturedImage(imageData);
+      // Enviar para a API da OpenAI
+      enhanceImage(imageData);
     }).catch(err => {
       console.error('Erro ao capturar imagem:', err);
       statusText.textContent = 'Erro ao capturar imagem. Tente novamente.';
     });
   });
+
+  // Função para enviar imagem para a API da OpenAI
+  async function enhanceImage(imageData) {
+    // Mostrar loading
+    loadingContainer.style.display = 'flex';
+    
+    try {
+      // Fazer requisição para a API
+      const response = await fetch('chat.php', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          image_base64: imageData
+        })
+      });
+      
+      const data = await response.json();
+      
+      // Esconder loading
+      loadingContainer.style.display = 'none';
+      
+      if (data.status === 'ok' && data.enhanced_base64) {
+        // Mostrar imagem melhorada no segundo modal
+        enhancedImage.src = data.enhanced_base64;
+        enhancedModal.style.display = 'block';
+        statusText.textContent = 'Imagem melhorada com sucesso!';
+        
+        // Configurar botão de download
+        downloadEnhancedBtn.onclick = function() {
+          const link = document.createElement('a');
+          link.download = 'mapa-melhorado.png';
+          link.href = data.enhanced_base64;
+          link.click();
+        };
+      } else {
+        console.error('Erro na resposta da API:', data);
+        statusText.textContent = 'Erro ao processar imagem com IA.';
+        alert('Erro ao processar imagem com IA: ' + (data.error || 'Erro desconhecido'));
+      }
+    } catch (error) {
+      console.error('Erro na requisição:', error);
+      loadingContainer.style.display = 'none';
+      statusText.textContent = 'Erro ao comunicar com o servidor.';
+      alert('Erro ao comunicar com o servidor: ' + error.message);
+    }
+  }
 
   // Função para resetar a seleção
   function resetSelection() {
@@ -310,60 +492,15 @@ html, body {
     document.getElementById('map').style.cursor = '';
   }
 
-  // Função para mostrar a imagem capturada em um modal
-  function showCapturedImage(imageData) {
-    // Criar modal
-    const modal = document.createElement('div');
-    modal.style.position = 'fixed';
-    modal.style.top = '0';
-    modal.style.left = '0';
-    modal.style.width = '100%';
-    modal.style.height = '100%';
-    modal.style.backgroundColor = 'rgba(0,0,0,0.8)';
-    modal.style.display = 'flex';
-    modal.style.justifyContent = 'center';
-    modal.style.alignItems = 'center';
-    modal.style.zIndex = '2000';
-    
-    // Criar imagem
-    const img = document.createElement('img');
-    img.src = imageData;
-    img.style.maxWidth = '90%';
-    img.style.maxHeight = '90%';
-    img.style.border = '5px solid white';
-    img.style.boxShadow = '0 0 20px rgba(0,0,0,0.5)';
-    
-    // Adicionar imagem ao modal
-    modal.appendChild(img);
-    
-    // Adicionar modal ao body
-    document.body.appendChild(modal);
-    
-    // Fechar modal ao clicar
-    modal.addEventListener('click', function() {
-      document.body.removeChild(modal);
-    });
-    
-    // Adicionar botão de fechar
-    const closeBtn = document.createElement('button');
-    closeBtn.textContent = 'Fechar (X)';
-    closeBtn.style.position = 'absolute';
-    closeBtn.style.top = '20px';
-    closeBtn.style.right = '20px';
-    closeBtn.style.padding = '10px';
-    closeBtn.style.backgroundColor = '#f44336';
-    closeBtn.style.color = 'white';
-    closeBtn.style.border = 'none';
-    closeBtn.style.borderRadius = '4px';
-    closeBtn.style.cursor = 'pointer';
-    closeBtn.style.fontSize = '16px';
-    
-    closeBtn.addEventListener('click', function() {
-      document.body.removeChild(modal);
-    });
-    
-    modal.appendChild(closeBtn);
-  }
+  // Fechar modais ao clicar fora
+  window.addEventListener('click', function(event) {
+    if (event.target === originalModal) {
+      originalModal.style.display = 'none';
+    }
+    if (event.target === enhancedModal) {
+      enhancedModal.style.display = 'none';
+    }
+  });
 </script>
 
 <?php
