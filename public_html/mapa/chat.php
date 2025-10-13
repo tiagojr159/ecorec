@@ -42,7 +42,6 @@ if ($bin === false) {
 }
 
 // 2) Chave da OpenAI via ambiente (NUNCA deixe hardcoded!)
-$apiKey = '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';
 if (!$apiKey) {
     http_response_code(500);
     echo json_encode(["error" => "OPENAI_API_KEY não configurada no ambiente."]);
