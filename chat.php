@@ -31,7 +31,7 @@ if (!$dataUrl || !preg_match('/^data:image\/(png|jpeg|jpg);base64,/', $dataUrl, 
 }
 
 // 🔐 Configure sua chave por variável de ambiente de preferência
-$apiKey = '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';
+$apiKey = 'SUA_CHAVE_AQUI';
 
 // Converte dataURL → binário e salva arquivo temporário
 $ext = strtolower($m[1]) === 'jpeg' ? 'jpg' : strtolower($m[1]);
