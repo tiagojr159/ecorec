@@ -172,6 +172,8 @@ if ($usarImagemExistente == true) {
 // CONTINUA O CÓDIGO ORIGINAL
 // ================================
 
+require_once __DIR__ . '/../config.php';
+$apiKey = (defined('OPENAI_API_KEY') ? constant('OPENAI_API_KEY') : ($_ENV['OPENAI_API_KEY'] ?? getenv('OPENAI_API_KEY')));
 
 if (!$apiKey) respond_json(500, ["error" => "OPENAI_API_KEY não configurada."]);
 $orgId  = getenv('OPENAI_ORG_ID') ?: ($_ENV['OPENAI_ORG_ID'] ?? '');
