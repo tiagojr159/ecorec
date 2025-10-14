@@ -32,6 +32,7 @@ require_once __DIR__ . '/../header.php';
     height: 100%;
     width: 100%;
     border-radius: 9px;
+    touch-action: none; /* Desabilitar ações de toque padrão */
   }
 
   /* Cabeçalho da telinha */
@@ -47,16 +48,12 @@ require_once __DIR__ . '/../header.php';
     border-radius: 9px 9px 0 0;
     display: flex;
     flex-direction: column;
-    /* Alterado para coluna */
     justify-content: center;
-    /* Centralizar */
     align-items: center;
-    /* Centralizar */
   }
 
   .map-title {
     margin: 0 0 10px 0;
-    /* Adicionado margem inferior */
     font-size: 1.2rem;
     color: #333;
     font-weight: 600;
@@ -487,44 +484,22 @@ require_once __DIR__ . '/../header.php';
     .improvements-grid {
       grid-template-columns: 1fr;
     }
-  }
-
-  /* Adicione no final da seção <style> */
-  .improvements-actions {
-    text-align: center;
-    margin-top: 20px;
-    position: relative;
-    z-index: 10;
-  }
-
-  .improvements-actions button {
-    margin: 0 10px;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 16px;
-    transition: background-color 0.3s;
-    position: relative;
-    z-index: 20;
-  }
-
-  .improvements-actions .submit-btn {
-    background-color: #4CAF50;
-    color: white;
-  }
-
-  .improvements-actions .submit-btn:hover {
-    background-color: #45a049;
-  }
-
-  .improvements-actions .cancel-btn {
-    background-color: #f44336;
-    color: white;
-  }
-
-  .improvements-actions .cancel-btn:hover {
-    background-color: #d32f2f;
+    
+    /* Melhorar interação com toque em dispositivos móveis */
+    .capture-btn {
+      padding: 12px 20px;
+      font-size: 16px;
+      margin: 5px;
+    }
+    
+    .map-header {
+      padding: 15px;
+    }
+    
+    /* Garantir que a área de seleção seja visível em dispositivos móveis */
+    .selection-box {
+      border-width: 3px;
+    }
   }
 </style>
 
@@ -550,9 +525,6 @@ require_once __DIR__ . '/../header.php';
     <p><strong>Zoom:</strong> até 23 (forçado)</p>
   </div>
 </div>
-
-<!-- Botão centralizado abaixo do mapa -->
-
 
 <!-- Modal de seleção de melhorias -->
 <div id="improvementsModal" class="improvements-modal">
@@ -632,7 +604,6 @@ require_once __DIR__ . '/../header.php';
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://unpkg.com/leaflet-providers@1.13.0/leaflet-providers.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-
 
 <script>
   // Lista de melhorias disponíveis
@@ -848,15 +819,15 @@ require_once __DIR__ . '/../header.php';
     document.getElementById('map').style.cursor = 'crosshair';
   });
 
-  // Eventos do mouse para seleção
+  // Eventos de mouse para seleção (desktop)
   map.getContainer().addEventListener('mousedown', function(e) {
     if (!isSelecting) return;
-
+    
     startPoint = {
-      x: e.offsetX,
-      y: e.offsetY
+        x: e.offsetX,
+        y: e.offsetY
     };
-
+    
     selectionBox.style.left = startPoint.x + 'px';
     selectionBox.style.top = startPoint.y + 'px';
     selectionBox.style.width = '0px';
@@ -866,16 +837,16 @@ require_once __DIR__ . '/../header.php';
 
   map.getContainer().addEventListener('mousemove', function(e) {
     if (!isSelecting || !startPoint) return;
-
+    
     const currentX = e.offsetX;
     const currentY = e.offsetY;
-
+    
     const width = Math.abs(currentX - startPoint.x);
     const height = Math.abs(currentY - startPoint.y);
-
+    
     const left = Math.min(currentX, startPoint.x);
     const top = Math.min(currentY, startPoint.y);
-
+    
     selectionBox.style.left = left + 'px';
     selectionBox.style.top = top + 'px';
     selectionBox.style.width = width + 'px';
@@ -884,7 +855,63 @@ require_once __DIR__ . '/../header.php';
 
   map.getContainer().addEventListener('mouseup', function() {
     if (!isSelecting) return;
+    startPoint = null;
+  });
 
+  // Eventos de toque para seleção (dispositivos móveis)
+  map.getContainer().addEventListener('touchstart', function(e) {
+    if (!isSelecting) return;
+    
+    // Impedir o comportamento padrão para evitar rolagem da página
+    e.preventDefault();
+    
+    // Obter as coordenadas do toque
+    const touch = e.touches[0];
+    const rect = map.getContainer().getBoundingClientRect();
+    
+    startPoint = {
+        x: touch.clientX - rect.left,
+        y: touch.clientY - rect.top
+    };
+    
+    selectionBox.style.left = startPoint.x + 'px';
+    selectionBox.style.top = startPoint.y + 'px';
+    selectionBox.style.width = '0px';
+    selectionBox.style.height = '0px';
+    selectionBox.style.display = 'block';
+  });
+
+  map.getContainer().addEventListener('touchmove', function(e) {
+    if (!isSelecting || !startPoint) return;
+    
+    // Impedir o comportamento padrão para evitar rolagem da página
+    e.preventDefault();
+    
+    // Obter as coordenadas do toque
+    const touch = e.touches[0];
+    const rect = map.getContainer().getBoundingClientRect();
+    
+    const currentX = touch.clientX - rect.left;
+    const currentY = touch.clientY - rect.top;
+    
+    const width = Math.abs(currentX - startPoint.x);
+    const height = Math.abs(currentY - startPoint.y);
+    
+    const left = Math.min(currentX, startPoint.x);
+    const top = Math.min(currentY, startPoint.y);
+    
+    selectionBox.style.left = left + 'px';
+    selectionBox.style.top = top + 'px';
+    selectionBox.style.width = width + 'px';
+    selectionBox.style.height = height + 'px';
+  });
+
+  map.getContainer().addEventListener('touchend', function(e) {
+    if (!isSelecting) return;
+    
+    // Impedir o comportamento padrão
+    e.preventDefault();
+    
     startPoint = null;
   });
 
@@ -936,7 +963,7 @@ require_once __DIR__ . '/../header.php';
     });
   });
 
-  // Evento para submeter as melhorias selecionadas - CORREÇÃO PRINCIPAL
+  // Evento para submeter as melhorias selecionadas
   submitImprovementsBtn.addEventListener('click', function(e) {
     e.preventDefault(); // Prevenir comportamento padrão
     e.stopPropagation(); // Impedir propagação do evento
@@ -966,7 +993,6 @@ require_once __DIR__ . '/../header.php';
     // Mostrar o overlay de carregamento na imagem melhorada
     imageLoadingOverlay.style.display = 'contents';
     imageLoadingOverlay.querySelector('img').style.margin = '0 auto';
-
 
     // Enviar para a API da OpenAI
     enhanceImage(capturedImageData, selectedImprovements);
@@ -1102,10 +1128,10 @@ require_once __DIR__ . '/../header.php';
     selectionBox.style.display = 'none';
     selectAreaBtn.style.display = 'inline-block';
     captureBtn.style.display = 'none';
-
+    
     // Remover classe active do botão
     selectAreaBtn.classList.remove('active');
-
+    
     // Reabilitar controles do mapa
     map.dragging.enable();
     map.touchZoom.enable();
@@ -1113,9 +1139,12 @@ require_once __DIR__ . '/../header.php';
     map.scrollWheelZoom.enable();
     map.boxZoom.enable();
     map.keyboard.enable();
-
+    
     // Restaurar cursor
     document.getElementById('map').style.cursor = '';
+    
+    // Garantir que eventos de toque funcionem corretamente após resetar
+    map.getContainer().style.touchAction = 'manipulation';
   }
 
   // Fechar modal ao clicar fora
