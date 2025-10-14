@@ -326,6 +326,30 @@ require_once __DIR__ . '/../header.php';
     position: relative;
   }
 
+  /* Estilo para a animação de carregamento */
+  .loading-animation {
+    text-align: center;
+    padding: 30px 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .loading-animation p {
+    font-size: 16px;
+    line-height: 1.5;
+    margin-bottom: 20px;
+    color: #333;
+  }
+
+  .loading-animation img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  }
+
   .improvements-grid {
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
@@ -534,16 +558,26 @@ require_once __DIR__ . '/../header.php';
 <div id="improvementsModal" class="improvements-modal">
   <div class="improvements-content">
     <span class="close">&times;</span>
-    <h2 class="modal-title">Potencial Identificado:</h2>
-    <h3>O cruzamentos de dados identificou os seguintes potencial</h3>
-
-    <div class="improvements-grid" id="improvementsGrid">
-      <!-- Itens de melhoria serão adicionados via JavaScript -->
+    <h2 class="modal-title">Potencial</h2>
+    
+    <!-- Animação de carregamento -->
+    <div id="loadingAnimation" class="loading-animation">
+      <p>Estamos fazendo o cruzamento de dados com a base de dados da Prefeitura do Recife para Identificar potencial de revitalização
+       </p>
+      <img src="../images/Prague.gif" alt="Carregando dados...">
     </div>
+    
+    <!-- Formulário de melhorias (inicialmente oculto) -->
+    <div id="improvementsForm" style="display: none;">
+      <h3>O cruzamentos de dados identificou os seguinte potencial</h3>
+      <div class="improvements-grid" id="improvementsGrid">
+        <!-- Itens de melhoria serão adicionados via JavaScript -->
+      </div>
 
-    <div class="improvements-actions">
-      <button id="cancelImprovementsBtn" class="cancel-btn">Cancelar</button>
-      <button id="submitImprovementsBtn" class="submit-btn">Aplicar Potencial</button>
+      <div class="improvements-actions">
+        <button id="cancelImprovementsBtn" class="cancel-btn">Cancelar</button>
+        <button id="submitImprovementsBtn" class="submit-btn">Aplicar Potencial</button>
+      </div>
     </div>
   </div>
 </div>
@@ -745,6 +779,10 @@ require_once __DIR__ . '/../header.php';
   function initImprovementsGrid() {
     improvementsGrid.innerHTML = '';
 
+    // Mostrar a animação e esconder o formulário
+    document.getElementById('loadingAnimation').style.display = 'flex';
+    document.getElementById('improvementsForm').style.display = 'none';
+
     // Obter melhorias aleatórias
     const randomImprovements = getRandomImprovements();
 
@@ -765,6 +803,12 @@ require_once __DIR__ . '/../header.php';
       item.appendChild(label);
       improvementsGrid.appendChild(item);
     });
+
+    // Após 5 segundos, esconder a animação e mostrar o formulário
+    setTimeout(() => {
+      document.getElementById('loadingAnimation').style.display = 'none';
+      document.getElementById('improvementsForm').style.display = 'block';
+    }, 5000);
   }
 
   // Fechar modal de melhorias
@@ -969,36 +1013,6 @@ require_once __DIR__ . '/../header.php';
           link.click();
         };
         calcularEstimativas(selectionDimensions.width, selectionDimensions.height);
-
-
-
-
-
-        /*
-              if (data.status === 'ok' && data.enhanced_base64) {
-                setTimeout(() => {
-                  enhancedImage.src = data.enhanced_base64;
-                  imageLoadingOverlay.style.display = 'none';
-                }, 65000);
-                downloadEnhancedBtn.onclick = function() {
-                  const link = document.createElement('a');
-                  link.download = 'mapa-melhorado.png';
-                  link.href = data.enhanced_base64;
-                  link.click();
-                };
-                calcularEstimativas(selectionDimensions.width, selectionDimensions.height);
-         */
-
-
-
-
-
-
-
-
-
-
-
       } else {
         console.error('Erro na resposta da API:', data);
         imageLoadingOverlay.style.display = 'none';
