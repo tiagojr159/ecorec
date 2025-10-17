@@ -123,10 +123,10 @@ if ($usarImagemExistente == true) {
 // CONTINUA O CÓDIGO ORIGINAL
 // ================================
 
-require_once __DIR__ . '/../config.php'; 
-$apiKey = (defined('OPENAI_API_KEY') ? constant('OPENAI_API_KEY') : ($_ENV['OPENAI_API_KEY'] ?? getenv('OPENAI_API_KEY')));
+require_once __DIR__ . '/../../config.php'; 
+$apiKey = $config['apiKey'] ?? null;
 
-if (!$apiKey) respond_json(500, ["error" => "OPENAI_API_KEY não configurada."]);
+if (!$apiKey) respond_json(500, ["error" => "Chave API não configurada em config.php."]);
 $orgId  = getenv('OPENAI_ORG_ID') ?: ($_ENV['OPENAI_ORG_ID'] ?? '');
 
 $tmpBase = tempnam(sys_get_temp_dir(), 'cap_');
