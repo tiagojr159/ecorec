@@ -5,7 +5,7 @@
  */
 
 
-$usarImagemExistente = true;
+$usarImagemExistente = false;
 
 
 

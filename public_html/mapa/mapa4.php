@@ -1076,37 +1076,37 @@ require_once __DIR__ . '/../header.php';
     const itens = [{
         icon: '☀️',
         label: 'Placas Solares',
-        value: `${(estimativas.placasSolares / 50).toFixed(1)} unidades`
+        value: `${(estimativas.placasSolares / 15).toFixed(1)} unidades`
       },
       {
         icon: '🌱',
         label: 'Grama Plantada',
-        value: `${(estimativas.grama / 50).toFixed(1)} m²`
+        value: `${(estimativas.grama / 15).toFixed(1)} m²`
       },
       {
         icon: '🌳',
         label: 'Árvores Plantadas',
-        value: `${(estimativas.arvores / 50).toFixed(1)} unidades`
+        value: `${(estimativas.arvores / 15).toFixed(1)} unidades`
       },
       {
         icon: '🪑',
         label: 'Bancos de Jardim',
-        value: `${(estimativas.bancos / 50).toFixed(1)} unidades`
+        value: `${(estimativas.bancos / 15).toFixed(1)} unidades`
       },
       {
         icon: '🎨',
         label: 'Tinta para Pintura',
-        value: `${(estimativas.tinta / 50).toFixed(1)} litros`
+        value: `${(estimativas.tinta / 15).toFixed(1)} litros`
       },
       {
         icon: '💡',
         label: 'Lâmpadas',
-        value: `${(estimativas.lampadas / 50).toFixed(1)} unidades`
+        value: `${(estimativas.lampadas / 15).toFixed(1)} unidades`
       },
       {
         icon: '🔌',
         label: 'Fiação Elétrica',
-        value: `${(estimativas.fiação / 50).toFixed(1)} metros`
+        value: `${(estimativas.fiação / 15).toFixed(1)} metros`
       }
     ];
 
